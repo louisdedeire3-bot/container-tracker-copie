@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Container Tracker — Green Charcoal Namibia</title>
+<!-- PWA -->
+<meta name="theme-color" content="#1a1a1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GCN Tracker">
+<link rel="apple-touch-icon" id="pwa-icon" href="">
+<link rel="manifest" id="pwa-manifest" href="">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;font-size:15px;background:#f5f5f3;color:#1a1a1a;min-height:100vh}
+.header{background:#1a1a1a;color:#fff;padding:14px 24px;display:flex;align-items:center;gap:12px}
+.header h1{font-size:16px;font-weight:500}
+.header span{font-size:13px;opacity:0.5}
+.wrap{max-width:960px;margin:0 auto;padding:24px}
+.tabs{display:flex;margin-bottom:24px;background:#fff;border:0.5px solid #ddd;border-radius:10px;overflow:hidden}
+.tab{flex:1;padding:11px 10px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:500;color:#888;border-right:0.5px solid #eee;font-family:inherit}
+.tab:last-child{border-right:none}
+.tab.active{background:#1a1a1a;color:#fff}
+.tab:hover:not(.active){background:#f5f5f3}
+.section{display:none}.section.active{display:block}
+.card{background:#fff;border:0.5px solid #e0e0e0;border-radius:10px;padding:20px;margin-bottom:16px}
+.card-title{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:16px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:11px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
+.form-group input,.form-group select{border:0.5px solid #ddd;border-radius:8px;padding:8px 10px;font-size:14px;background:#fff;color:#1a1a1a;font-family:inherit;width:100%}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:#1a1a1a}
+.form-group input[readonly]{background:#f5f5f3;color:#555}
+.product-row{background:#f9f9f7;border:0.5px solid #e8e8e6;border-radius:8px;padding:12px;margin-bottom:10px}
+.product-grid{display:grid;grid-template-columns:3fr 1fr 1fr 1fr 36px;gap:10px;align-items:end}
+.btn{padding:9px 18px;border-radius:8px;border:0.5px solid #ddd;background:#fff;color:#1a1a1a;font-size:14px;cursor:pointer;font-family:inherit;font-weight:500}
+.btn-primary{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.btn-danger{background:#fff;color:#c0392b;border-color:#f0c0bb}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn:hover{opacity:0.85}
+.btn-add{width:100%;border:0.5px dashed #ccc;background:#fafaf8;color:#888;padding:8px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit;margin-bottom:16px}
+.btn-add:hover{background:#f0f0ee;color:#555}
+.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+.badge{font-size:11px;padding:3px 9px;border-radius:6px;font-weight:600}
+.badge-pending{background:#fef3e2;color:#a0520a}
+.badge-loaded{background:#e8f5e2;color:#2d6a1a}
+.info-bar{border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;display:flex;align-items:center;justify-content:space-between}
+.info-bar.success{background:#e8f5e2;border:0.5px solid #b8ddb0;color:#2d6a1a}
+.info-bar.error{background:#fef0f0;border:0.5px solid #f0c0bb;color:#c0392b}
+.info-bar.connecting{background:#f0f7ff;border:0.5px solid #c0d8f0;color:#185FA5}
+.client-chip{display:inline-block;background:#e8f0fe;color:#1a56c4;font-size:11px;padding:2px 10px;border-radius:5px;font-weight:600;margin-left:8px}
+.client-info-box{background:#f9f9f7;border:0.5px solid #e0e0e0;border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px}
+.record-card{background:#fff;border:0.5px solid #e0e0e0;border-radius:10px;padding:16px;margin-bottom:12px}
+.record-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.record-booking{font-size:16px;font-weight:500}
+.record-meta{font-size:13px;color:#888;margin-top:2px}
+.record-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:13px}
+.field-lbl{color:#999;font-size:11px;text-transform:uppercase;letter-spacing:0.04em}
+.field-val{font-weight:500;color:#1a1a1a;font-size:13px}
+.divider{height:0.5px;background:#eee;margin:14px 0}
+.product-tag{display:inline-flex;gap:5px;background:#e8f0fe;color:#1a56c4;font-size:11px;padding:3px 8px;border-radius:5px;margin-right:4px;margin-bottom:4px;font-weight:500}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:#fff;border:0.5px solid #e0e0e0;border-radius:10px;padding:16px}
+.stat-lbl{font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em}
+.stat-val{font-size:26px;font-weight:500}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:20px;right:20px;background:#1a1a1a;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+.net-summary{background:#f0f7ff;border:0.5px solid #c0d8f0;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;display:flex;gap:20px;flex-wrap:wrap}
+.net-summary span{color:#185FA5;font-weight:500}
+.filter-info{background:#fef3e2;border:0.5px solid #f0d090;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:#a0520a}
+.sub-tabs{display:flex;gap:8px;margin-bottom:16px}
+.sub-tab{padding:7px 16px;border-radius:8px;border:0.5px solid #ddd;background:#fff;color:#888;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
+.sub-tab.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.sub-tab:hover:not(.active){background:#f5f5f3}
+.sub-section{display:none}.sub-section.active{display:block}
+.client-recap-card{background:#fff;border:0.5px solid #e0e0e0;border-radius:10px;padding:16px;margin-bottom:12px}
+.accordion-toggle{background:none;border:none;cursor:pointer;font-size:16px;color:#888;padding:0;transition:transform 0.2s;line-height:1}
+.accordion-toggle.open{transform:rotate(180deg)}
+.accordion-body{display:none;margin-top:12px}
+.accordion-body.open{display:block}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9998}
+.modal-box{background:#fff;border-radius:14px;padding:24px;width:90%;max-width:500px;max-height:90vh;overflow-y:auto}
+.modal-box h3{font-size:16px;font-weight:600;margin-bottom:16px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.client-recap-header{font-size:15px;font-weight:600;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.product-recap-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:0.5px solid #f0f0f0;font-size:13px}
+.product-recap-row:last-child{border-bottom:none}
+.tonnage-badge{background:#e8f5e2;color:#2d6a1a;font-size:12px;font-weight:600;padding:2px 10px;border-radius:5px}
+.btn-photo{width:100%;margin-top:6px;border:0.5px dashed #ccc;background:#f9f9f7;color:#555;padding:6px;border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit}
+.btn-photo:hover{background:#f0f0ee}
+.btn-photo.loading{background:#fef3e2;color:#a0520a;border-color:#f0d090}
+@media(max-width:640px){
+  .form-grid,.form-grid-3{grid-template-columns:1fr}
+  .product-grid{grid-template-columns:1fr 1fr}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .record-fields{grid-template-columns:1fr 1fr}
+}
+/* LOGIN */
+.login-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-box{background:#fff;border-radius:16px;padding:40px;width:320px;text-align:center}
+.login-box h2{font-size:20px;font-weight:600;margin-bottom:6px}
+.login-box p{color:#888;font-size:13px;margin-bottom:24px}
+.login-box .logo{font-size:32px;margin-bottom:16px}
+.pin-input{display:flex;gap:10px;justify-content:center;margin-bottom:20px}
+.pin-input input{width:48px;height:56px;text-align:center;font-size:22px;font-weight:600;border:0.5px solid #ddd;border-radius:10px;outline:none;font-family:inherit}
+.pin-input input:focus{border-color:#1a1a1a}
+.pin-error{color:#c0392b;font-size:13px;margin-bottom:12px;min-height:18px}
+.btn-login{width:100%;padding:12px;background:#1a1a1a;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit}
+.btn-login:hover{opacity:0.85}
+.role-badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:12px;font-weight:600;margin-left:8px}
+.role-badge.bureau{background:#e8f5e2;color:#2d6a1a}
+.role-badge.terrain{background:#fef3e2;color:#a0520a}
+</style>
+</head>
+<body>
+<!-- LOGIN OVERLAY -->
+<div class="login-overlay" id="login-overlay">
+  <div class="login-box">
+    <div class="logo">🌿</div>
+    <h2>Container Tracker</h2>
+    <p>Green Charcoal Namibia</p>
+    <div class="pin-input">
+      <input type="password" maxlength="1" id="p1" oninput="nextPin(this,'p2')" onkeydown="pinBack(event,this,null)">
+      <input type="password" maxlength="1" id="p2" oninput="nextPin(this,'p3')" onkeydown="pinBack(event,this,'p1')">
+      <input type="password" maxlength="1" id="p3" oninput="nextPin(this,'p4')" onkeydown="pinBack(event,this,'p2')">
+      <input type="password" maxlength="1" id="p4" oninput="nextPin(this,null)" onkeydown="pinBack(event,this,'p3')">
+    </div>
+    <div class="pin-error" id="pin-error"></div>
+    <button class="btn-login" onclick="checkPin()">Enter</button>
+  </div>
+</div>
+
+<div class="header">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+  <h1>Container Tracker</h1>
+  <span>Green Charcoal Namibia</span>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:12px"><div id="role-indicator"></div></div>
+</div>
+<div class="wrap">
+  <div id="status-bar" class="info-bar connecting">
+    <span>Connecting to Google Sheets...</span>
+    <a href="https://docs.google.com/spreadsheets" target="_blank" style="color:#185FA5;font-weight:500;text-decoration:none">Open Sheet →</a>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('bureau')">🏢 Office</button>
+    <button class="tab" onclick="showTab('terrain')">🚛 Field</button>
+    <button class="tab" onclick="showTab('suivi')">📊 Tracking</button>
+    <button class="tab" onclick="showTab('admin')" style="display:none">⚙️ Admin</button>
+  </div>
+
+  <!-- BUREAU -->
+  <div id="bureau" class="section active">
+    <div class="card">
+      <div class="card-title">Create booking</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Client *</label>
+          <select id="b-client" onchange="onClientSelect()">
+            <option value="">-- Select client --</option>
+            <option value="ESSEGE">ESSEGE</option>
+            <option value="TAS">TECHNO AIR SYSTEMS (TAS)</option>
+            <option value="TAI">TAI SA</option>
+            <option value="SOKOM">SARL SOKOM</option>
+            <option value="RTD">RTD - ROYAL TRADE DISTRIBUTION</option>
+            <option value="LANTANA">LANTANA DISTRIBUTION</option>
+            <option value="IHK">IHK - Kamal Ridjali</option>
+            <option value="BRICOSTORE">ZINSAK SARL BRICO STORE</option>
+            <option value="GABBY">GABBY</option>
+            <option value="SCHMITZ">HEINRICH SCHMITZ</option>
+            <option value="Jack Pink Ltd">Jack Pink Ltd</option>
+            <option value="IBECOSOL">IBECOSOL SL</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Booking number *</label><input type="text" id="b-booking" placeholder="e.g. EBKG16813965"></div>
+      </div>
+      <div id="b-client-info" class="client-info-box" style="display:none"></div>
+      <div class="form-grid">
+        <div class="form-group"><label>Shipping line</label>
+          <select id="b-shipping">
+            <option value="">-- Select --</option>
+            <option>Maersk</option><option>MSC</option><option>CMA CGM</option>
+            <option>Hapag-Lloyd</option><option>Evergreen</option><option>PIL</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>BOL / Shippers Reference</label><input type="text" id="b-bol" placeholder="e.g. MEDUW1210147"></div>
+        <div class="form-group"><label>Vessel</label><input type="text" id="b-vessel" placeholder="e.g. MSC HERMES"></div>
+        <div class="form-group"><label>Voyage No</label><input type="text" id="b-voyage" placeholder="e.g. ZA615R"></div>
+        <div class="form-group"><label>Port of discharge</label><input type="text" id="b-dest" placeholder="e.g. POINTE DES GALETS, REUNION"></div>
+        <div class="form-group"><label>Number of containers *</label><input type="number" id="b-containers" placeholder="e.g. 5" min="1"></div>
+        <div class="form-group"><label>Stack opening</label><input type="date" id="b-open"></div>
+        <div class="form-group"><label>Stack close</label><input type="date" id="b-close"></div>
+      </div>
+      <div class="actions"><button class="btn btn-primary" id="btn-booking" onclick="createBooking()">+ Create booking</button></div>
+    </div>
+  </div>
+
+  <!-- TERRAIN -->
+  <div id="terrain" class="section">
+    <div class="card">
+      <div class="card-title">Record loading</div>
+      <div class="form-grid" style="grid-template-columns:1fr">
+        <div class="form-group"><label>Booking number *</label>
+          <select id="t-booking" onchange="onBookingSelect()"><option value="">-- Select booking --</option></select>
+        </div>
+      </div>
+      <div id="t-client-info" style="display:none" class="filter-info"></div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Container number *</label>
+          <input type="text" id="t-container" placeholder="e.g. MEDU8773524">
+          <button class="btn-photo" onclick="triggerPhoto('container')">📷 Scan container</button>
+          <input type="file" id="photo-container" accept="image/*" style="display:none" onchange="analyzePhoto('container')">
+          <div id="container-photo-status" style="font-size:11px;color:#888;margin-top:4px"></div>
+        </div>
+        <div class="form-group">
+          <label>Seal number</label>
+          <input type="text" id="t-seal" placeholder="e.g. FX40830347">
+          <button class="btn-photo" onclick="triggerPhoto('seal')">📷 Scan seal</button>
+          <input type="file" id="photo-seal" accept="image/*" style="display:none" onchange="analyzePhoto('seal')">
+          <div id="seal-photo-status" style="font-size:11px;color:#888;margin-top:4px"></div>
+        </div>
+        <div class="form-group"><label>Loading date</label><input type="date" id="t-date"></div>
+        <div class="form-group"><label>Date of packaging</label><input type="date" id="t-packdate"></div>
+        <div class="form-group"><label>Transporter</label><input type="text" id="t-transporter" placeholder="Transporter name"></div>
+        <div class="form-group"><label>Temperature (°C)</label><input type="number" id="t-temp" placeholder="e.g. 21"></div>
+      </div>
+      <div class="form-grid-3">
+        <div class="form-group"><label>Tare (kg)</label><input type="number" id="t-tare" placeholder="e.g. 3940" oninput="updateTotals()"></div>
+        <div class="form-group"><label>Net weight (kg) — auto</label><input type="number" id="t-net" readonly></div>
+        <div class="form-group"><label>Gross weight (kg) — auto</label><input type="number" id="t-gross" readonly></div>
+      </div>
+      <div id="net-summary" class="net-summary" style="display:none">
+        <div><div class="field-lbl">Total bags</div><span id="sum-bags">0</span></div>
+        <div><div class="field-lbl">Net weight</div><span id="sum-net">0 kg</span></div>
+        <div><div class="field-lbl">Gross weight</div><span id="sum-gross">0 kg</span></div>
+        <div><div class="field-lbl">Products</div><span id="sum-prods">0 ref(s)</span></div>
+      </div>
+      <div class="divider"></div>
+      <div class="card-title">Products in this container</div>
+      <div id="products-list"></div>
+      <button class="btn-add" onclick="addProduct()">+ Add product</button>
+      <div class="actions"><button class="btn btn-primary" id="btn-load" onclick="submitLoad()">✓ Validate loading</button></div>
+    </div>
+  </div>
+
+  <!-- SUIVI -->
+  <div id="suivi" class="section">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-lbl">Bookings</div><div class="stat-val" id="stat-bookings">—</div></div>
+      <div class="stat-card"><div class="stat-lbl">Containers</div><div class="stat-val" id="stat-loaded">—</div></div>
+      <div class="stat-card"><div class="stat-lbl">Total bags</div><div class="stat-val" id="stat-bags">—</div></div>
+      <div class="stat-card"><div class="stat-lbl">Net (t)</div><div class="stat-val" id="stat-weight">—</div></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+      <button onclick="refreshFromSheet()" id="btn-refresh" style="background:#fff;border:0.5px solid #ddd;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;color:#555">🔄 Refresh from Sheet</button>
+    </div>
+    <div class="sub-tabs">
+      <button class="sub-tab active" onclick="showSubTab('in-progress')">🔄 In Progress</button>
+      <button class="sub-tab" onclick="showSubTab('completed')">✅ Completed</button>
+      <button class="sub-tab" onclick="showSubTab('clients-recap')">👥 Clients</button>
+    </div>
+    <div id="in-progress" class="sub-section active">
+      <div id="records-inprogress"><div style="text-align:center;padding:40px;color:#aaa;font-size:14px">No bookings in progress</div></div>
+    </div>
+    <div id="completed" class="sub-section">
+      <div id="records-completed"><div style="text-align:center;padding:40px;color:#aaa;font-size:14px">No completed bookings</div></div>
+    </div>
+    <div id="clients-recap" class="sub-section">
+      <div id="records-clients"><div style="text-align:center;padding:40px;color:#aaa;font-size:14px">No data yet</div></div>
+    </div>
+  </div>
+  <!-- ADMIN -->
+  <div id="admin" class="section">
+    <div class="card">
+      <div class="card-title">Manage bookings</div>
+      <div id="admin-bookings-list"><div style="text-align:center;padding:20px;color:#aaa;font-size:14px">No bookings</div></div>
+    </div>
+  </div>
+</div>
+<!-- ALL DGCs MODAL -->
+<div class="modal-overlay" id="alldgc-modal" style="display:none">
+  <div class="modal-box">
+    <h3>📄 Generate all DGCs — <span id="alldgc-booking-label"></span></h3>
+    <p style="font-size:13px;color:#888;margin-bottom:16px">These dates will apply to all containers in this booking.</p>
+    <div class="form-grid">
+      <div class="form-group"><label>Date of production</label><input type="date" id="alldgc-proddate"></div>
+      <div class="form-group"><label>Declaration date</label><input type="date" id="alldgc-decldate"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeAllDGCModal()">Cancel</button>
+      <button class="btn btn-success" id="btn-alldgc" onclick="submitAllDGCs()" style="background:#2d6a1a;color:#fff;border-color:#2d6a1a">⬇ Download all DGCs</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT BOOKING MODAL -->
+<div class="modal-overlay" id="edit-modal" style="display:none">
+  <div class="modal-box">
+    <h3>✏️ Edit Booking — <span id="edit-booking-label"></span></h3>
+    <input type="hidden" id="edit-booking-key">
+    <div class="form-grid">
+      <div class="form-group"><label>Client</label>
+        <select id="edit-client">
+          <option value="">-- Select client --</option>
+          <option value="ESSEGE">ESSEGE</option>
+          <option value="TAS">TECHNO AIR SYSTEMS (TAS)</option>
+          <option value="TAI">TAI SA</option>
+          <option value="SOKOM">SARL SOKOM</option>
+          <option value="RTD">RTD - ROYAL TRADE DISTRIBUTION</option>
+          <option value="LANTANA">LANTANA DISTRIBUTION</option>
+          <option value="IHK">IHK - Kamal Ridjali</option>
+          <option value="BRICOSTORE">ZINSAK SARL BRICO STORE</option>
+          <option value="GABBY">GABBY</option>
+          <option value="SCHMITZ">HEINRICH SCHMITZ</option>
+          <option value="Jack Pink Ltd">Jack Pink Ltd</option>
+          <option value="IBECOSOL">IBECOSOL SL</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Shipping line</label><input type="text" id="edit-shipping" placeholder="e.g. MSC"></div>
+      <div class="form-group"><label>Vessel</label><input type="text" id="edit-vessel" placeholder="e.g. MSC HERMES"></div>
+      <div class="form-group"><label>Voyage No</label><input type="text" id="edit-voyage" placeholder="e.g. ZA615R"></div>
+      <div class="form-group"><label>BOL / Shippers Ref</label><input type="text" id="edit-bol" placeholder="e.g. MEDUW1210147"></div>
+      <div class="form-group"><label>Port of discharge</label><input type="text" id="edit-dest" placeholder="e.g. ANTWERP, BELGIUM"></div>
+      <div class="form-group"><label>Number of containers</label><input type="number" id="edit-containers" min="1"></div>
+      <div class="form-group"><label>Stack opening</label><input type="date" id="edit-open"></div>
+      <div class="form-group"><label>Stack close</label><input type="date" id="edit-close"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeEditModal()">Cancel</button>
+      <button class="btn btn-primary" id="btn-save-edit" onclick="saveEditBooking()">💾 Save changes</button>
+    </div>
+  </div>
+</div>
+<!-- EDIT LOAD MODAL -->
+<div class="modal-overlay" id="editload-modal" style="display:none">
+  <div class="modal-box">
+    <h3>✏️ Edit Load — <span id="editload-container-label"></span></h3>
+    <input type="hidden" id="editload-bkg">
+    <input type="hidden" id="editload-id">
+    <div class="form-grid">
+      <div class="form-group"><label>Container number</label><input type="text" id="editload-container"></div>
+      <div class="form-group"><label>Seal number</label><input type="text" id="editload-seal"></div>
+      <div class="form-group"><label>Loading date</label><input type="date" id="editload-date"></div>
+      <div class="form-group"><label>Packaging date</label><input type="date" id="editload-packdate"></div>
+      <div class="form-group"><label>Transporter</label><input type="text" id="editload-transporter"></div>
+      <div class="form-group"><label>Temperature (°C)</label><input type="number" id="editload-temp"></div>
+      <div class="form-group"><label>Tare (kg)</label><input type="number" id="editload-tare" oninput="editloadTotals()"></div>
+    </div>
+    <div class="card-title" style="margin-top:8px">Products</div>
+    <div id="editload-products"></div>
+    <button class="btn-add" onclick="editloadAddProduct()">+ Add product</button>
+    <div class="net-summary" style="display:flex">
+      <div><div class="field-lbl">Net</div><span id="editload-net">0 kg</span></div>
+      <div><div class="field-lbl">Gross</div><span id="editload-gross">0 kg</span></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeEditLoadModal()">Cancel</button>
+      <button class="btn btn-primary" id="btn-save-editload" onclick="saveEditLoad()">💾 Save</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script>
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbwjzTRBv-maxMlhw67FH_6zu9tTGV-7kmbzcq8XVZXYYhftR4a_-6n5NMLbD1m4NvP3/exec';
+const LOCAL_KEY='gcn_v6';
+let localData=JSON.parse(localStorage.getItem(LOCAL_KEY)||'{"bookings":[]}');
+let productCount=0,currentClient='';
+
+const CLIENTS={
+  'ESSEGE':{name:'ESSEGE',addr1:'CHAUSSEE DE WATERLOO 1589d',addr2:'1180 UCCLE',country:'BELGIUM',email:'',shippingLines:['MSC','MAERSK'],ports:['ANTWERP, BELGIUM']},
+  'TAS':{name:'TECHNO AIR SYSTEMS',addr1:'Via Piovega 10',addr2:'Pieve del Grappa 31017',country:'ITALY',email:'',shippingLines:['MSC'],ports:['GENOA, ITALY','NAPLES, ITALY']},
+  'TAI':{name:'TAI SA',addr1:'PISISTRATOU 6',addr2:'AGIOS DIMITRIOS I 173 42',country:'GREECE',email:'',shippingLines:['MSC'],ports:['PIRAEUS, GREECE']},
+  'SOKOM':{name:'SARL SOKOM',addr1:'10 RUE CHARLES GOUNOD 10099',addr2:'SAINT-DENIS DE LA REUNION 97462',country:'REUNION ISLAND',email:'786sokom@gmail.com',shippingLines:['MSC'],ports:['POINTE DES GALETS, REUNION','LONGONI, MAYOTTE ISLAND']},
+  'RTD':{name:'RTD - ROYAL TRADE DISTRIBUTION',addr1:'69 rue Maréchal Leclerc',addr2:'BP 60121 ST DENIS DE LA REUNION 97463',country:'REUNION ISLAND',email:'',shippingLines:['MSC'],ports:['POINTE DES GALETS, REUNION','LONGONI, MAYOTTE ISLAND']},
+  'LANTANA':{name:'LANTANA DISTRIBUTION',addr1:'16 RUE DU COMMERCE',addr2:'97600 MAMOUDZOU',country:'MAYOTTE',email:'',shippingLines:['MSC'],ports:['POINTE DES GALETS, REUNION','LONGONI, MAYOTTE ISLAND']},
+  'IHK':{name:'IHK - Kamal Ridjali',addr1:'5 Rue Boeini Found',addr2:'97600 Koungou',country:'MAYOTTE',email:'info@ihkltd.com',shippingLines:['MSC'],ports:['POINTE DES GALETS, REUNION','LONGONI, MAYOTTE ISLAND']},
+  'BRICOSTORE':{name:'ZINSAK SARL BRICO STORE',addr1:'6 Boungou-Be Cavani',addr2:'Mamoudzou 97600',country:'MAYOTTE',email:'',shippingLines:['MSC'],ports:['POINTE DES GALETS, REUNION','LONGONI, MAYOTTE ISLAND']},
+  'GABBY':{name:'GABBY',addr1:'',addr2:'',country:'LATVIA',email:'',shippingLines:['MSC'],ports:[]},
+  'SCHMITZ':{name:'HEINRICH SCHMITZ',addr1:'HOCKSTEINER WEG 62',addr2:'MONCHENGLADBACH NW 41189',country:'GERMANY',email:'',shippingLines:['MSC'],ports:[]},
+  'Jack Pink Ltd':{name:'Jack Pink Ltd',addr1:'Capler Lane',addr2:'Fownhope',country:'UK',email:'darrinjd825@gmail.com',shippingLines:['MSC'],ports:['LONDON GATEWAY PORT, UK']},
+  'IBECOSOL':{name:'IBECOSOL SL',addr1:'CALLE LA GRANJA 15',addr2:'PO BOX : 28108',country:'SPAIN',email:'',shippingLines:['MSC'],ports:['CARTAGENA, SPAIN']}
+};
+
+const ALL_ITEMS=[
+  {code:'60201CAREDGFSC',desc:'BAGGED RED GRILL CHARCOAL FSC 100 % 2 KG - 196 BAGS',kg:2,clients:['ESSEGE']},
+  {code:'60251CHCHAL',desc:'BAGGED CHAR HALAL CHARCOAL 2.5 KG',kg:2.5,clients:['ESSEGE']},
+  {code:'60251CHCHALFSC5M2',desc:'ENSACHE CHAR HALAL CH.BOIS FSC 100% 2.5 KG 5M2',kg:2.5,clients:['ESSEGE']},
+  {code:'60251CUCUBA120NAMFSC',desc:'BAGGED CUBAX CHARCOAL FSC 100 % 2.5 KG',kg:2.5,clients:['ESSEGE']},
+  {code:'60251CUCUBAFSC5M2',desc:'ENSACHE CUBAX CH.BOIS FSC 100% 2.5 KG - NAMIBIE 5M2',kg:2.5,clients:['ESSEGE']},
+  {code:'60251REWE075FSC',desc:'BAGGED REWE CHARCOAL FSC 100 % 2.5 KG',kg:2.5,clients:['ESSEGE']},
+  {code:'60251REWE075FSC-5M2',desc:'BAGGED REWE CHARCOAL FSC 100 % 2.5 KG - 5M2',kg:2.5,clients:['ESSEGE']},
+  {code:'60251SCSOLF168FSC',desc:'BAGGED SOL CHARCOAL FSC 100 % 2.5 KG',kg:2.5,clients:['ESSEGE']},
+  {code:'60253REWE108FSC',desc:'BAGGED REWE CHARCOAL BRIQUETTE FSC 100 % 2.5 KG',kg:2.5,clients:['ESSEGE']},
+  {code:'60253REWE108FSC-5M2',desc:'BAGGED REWE CHARCOAL BRIQUETTE FSC 100 % 2.5 KG - 5M2',kg:2.5,clients:['ESSEGE']},
+  {code:'60301CONSILIAFSC5M2',desc:'BAGGED CONSILIA CHARCOAL FSC 100 % 3 KG',kg:3,clients:['TAS']},
+  {code:'60301DEDEFS130FSC',desc:'BAGGED DELHAIZE CHARCOAL FSC 100 % 3 KG - 130 SACS',kg:3,clients:['ESSEGE']},
+  {code:'60301DEDEFS130FSC5M2',desc:'BAGGED DELHAIZE CHARCOAL FSC 100 % 3 KG - 130 SACS - 5M2',kg:3,clients:['ESSEGE']},
+  {code:'60301FIBQ001FSC',desc:'BAGGED TAI FIRE BBQ FSC 100% 3 KG',kg:3,clients:['TAI']},
+  {code:'60301GRILLGGFSC',desc:'BAGGED GRILL GRILL GRILL CHARCOAL FSC 100 % 3 KG',kg:3,clients:['TAS']},
+  {code:'60301SELEXFSC',desc:'BAGGED SELEX CHARCOAL FSC 100% 3KG',kg:3,clients:['TAS']},
+  {code:'60301SELEXFSC5M2',desc:'BAGGED SELEX CHARCOAL FSC 100% 3KG - 5M2',kg:3,clients:['TAS']},
+  {code:'60303GABBYFSC208FSC',desc:'BAGGED GABBY CHARCOAL BRIQUETTE FSC 100 % 3 KG - 208 SACS',kg:3,clients:['GABBY']},
+  {code:'60303SCCOSOL208',desc:'BAGGED COCOSOL CHARCOAL BRIQUETTE FSC 100 % 3 KG',kg:3,clients:['ESSEGE']},
+  {code:'60401CASPEC112FSC',desc:'BAGGED SPECIAL GRILL CHARCOAL FSC 100 % 4 KG - 112 SACS',kg:4,clients:['SOKOM','RTD','IHK','BRICOSTORE','LANTANA']},
+  {code:'60401CHBGCNSAFSC',desc:'BAGGED GREEN CHARCOAL SA FSC 100 % 4 KG - 80 SACS',kg:4,clients:['Jack Pink Ltd']},
+  {code:'60401CUCUBAFSC',desc:'BAGGED CUBAX CHARCOAL FSC 100 % 4 KG',kg:4,clients:['ESSEGE']},
+  {code:'60401CUCUBAFSC5M2',desc:'ENSACHE CUBAX CH.BOIS FSC 100% 4 KG - NAMIBIE 5M2',kg:4,clients:['ESSEGE']},
+  {code:'60401SCFRIE112FSC',desc:'BAGGED BBQ AND FRIENDS CHARCOAL FSC 100 % 4 KG',kg:4,clients:['ESSEGE']},
+  {code:'60401SCFRIEFSC5M2',desc:'BAGGED BBQ AND FRIENDS CHARCOAL FSC 100 % 4 KG - 5M2',kg:4,clients:['ESSEGE']},
+  {code:'60401SCKINGFSC',desc:'KINGCOAL CHARCOAL FSC 100 % 4 KG',kg:4,clients:['SOKOM','RTD','IHK','BRICOSTORE','LANTANA']},
+  {code:'60401SCSOL112FSCRP',desc:'BAGGED SOL CHARCOAL FSC 100 % 4 KG - 112 SACS',kg:4,clients:['ESSEGE']},
+  {code:'60401SCSOL63FSC',desc:'BAGGED SOL CHARCOAL FSC 100 % 4 KG - 63 SACS',kg:4,clients:['ESSEGE']},
+  {code:'60401SCSOL63FSC5M2',desc:'BAGGED SOL CHARCOAL FSC 100 % 4 KG - 5M2',kg:4,clients:['ESSEGE']},
+  {code:'60401SCSOL72FSC_NAM',desc:'BAGGED SOL CHARCOAL FSC 100 % 4 KG - 72 SACS',kg:4,clients:['ESSEGE']},
+  {code:'60403TAFIBBQFSC',desc:'BAGGED TAI CHARCOAL BRIQUETTE FSC 100% 4 KG',kg:4,clients:['TAI']},
+  {code:'60501CAREDGFSC',desc:'BAGGED RED GRILL CHARCOAL FSC 100 % 5 KG',kg:5,clients:['SOKOM','RTD','IHK','BRICOSTORE','LANTANA']},
+  {code:'60501CHBGCNFSC',desc:'BAGGED GREEN CHARCOAL FSC 100 % 5KG',kg:5,clients:['SOKOM','RTD','IHK','BRICOSTORE','LANTANA']},
+  {code:'60501GRILLGGFSC',desc:'BAGGED GRILL GRILL GRILL CHARCOAL FSC 100 % 5 KG',kg:5,clients:['TAS']},
+  {code:'60501SCKINGFSC',desc:'KINGCOAL CHARCOAL FSC 100 % 5 KG',kg:5,clients:['SOKOM','RTD','IHK','BRICOSTORE','LANTANA']},
+  {code:'60501SCSOLFSC5M2',desc:'BAGGED SOL CHARCOAL FSC 100% 5 KG',kg:5,clients:['SOKOM','RTD','IHK','BRICOSTORE','LANTANA']},
+  {code:'60501TRPAPIFSC5M2',desc:'ENSACHE PAPILLON CH.BOIS FSC 100 % 4.8 KG 5M2',kg:4.8,clients:['TAS']},
+  {code:'60503SCCOSOLFSC',desc:'BAGGED COCOSOL CHARCOAL BRIQUETTE FSC 100 % 5 KG',kg:5,clients:['ESSEGE']},
+  {code:'60601HUHUBOFSC',desc:'BAGGED HUBO CHARCOAL FSC 100 % 6 KG - 70 BAGS',kg:6,clients:['ESSEGE']},
+  {code:'60601HUHUBOFSC-5M2',desc:'BAGGED HUBO CHARCOAL FSC 100 % 6 KG - 70 BAGS - 5M2',kg:6,clients:['ESSEGE']},
+  {code:'60701AVV072FSC',desc:'BAGGED AVEVE CHARCOAL FSC 100 % 7 KG',kg:7,clients:['ESSEGE']},
+  {code:'60701AVVFSC5M2',desc:'BAGGED AVEVE CHARCOAL FSC 100 % 7 KG - 5M2',kg:7,clients:['ESSEGE']},
+  {code:'60802CAREDG030FSCNAM',desc:'BAGGED RED GRILL CHARCOAL RESTAURANT FSC 100 % 8 KG - 30 SACS',kg:8,clients:['ESSEGE']},
+  {code:'60952CAGRIL055FSC',desc:'BAGGED GRILLY CHARCOAL RESTAURANT FSC 100 % 9.5KG - 55 SACS',kg:9.5,clients:['TAS']},
+  {code:'61001CABBQW045FSC',desc:'BBQ@WORK CH.BOIS FSC 100 % 10 KG - 45 SACS',kg:10,clients:['ESSEGE','Jack Pink Ltd']},
+  {code:'61001CASPEC045FSCRP',desc:'BAGGED SPECIAL GRILL CHARCOAL FSC 100 % 10 KG - 45 SACS',kg:10,clients:['SOKOM','RTD','IHK','BRICOSTORE','LANTANA']},
+  {code:'61001GABBYFSC',desc:'BAGGED GABBY CHARCOAL STANDARD FSC 100 % 10 KG',kg:10,clients:['GABBY']},
+  {code:'61001SCBELCNOIR',desc:'BAGGED BELCARBON BLACK CHARCOAL 10 KG',kg:10,clients:['SOKOM','RTD','IHK','BRICOSTORE','LANTANA']},
+  {code:'61001SCFRIE045FSC',desc:'BAGGED BBQ AND FRIENDS CHARCOAL FSC 100 % 10 KG',kg:10,clients:['ESSEGE']},
+  {code:'61001SCFRIEFSC5M2',desc:'BAGGED BBQ AND FRIENDS CHARCOAL FSC 100 % 10 KG - 5M2',kg:10,clients:['ESSEGE']},
+  {code:'61001SCHMITZFSC',desc:'BAGGED SCHMITZ CHARCOAL FSC 100 % 10 KG',kg:10,clients:['SCHMITZ']},
+  {code:'61001SCSOL045FSC',desc:'BAGGED SOL CHARCOAL FSC 100 % 10 KG',kg:10,clients:['ESSEGE']},
+  {code:'61001TRPAPIFSC5M2',desc:'ENSACHE PAPILLON CH.BOIS FSC 100 % 9.8 KG 5M2',kg:9.8,clients:['TAS']},
+  {code:'61002AVV040FSC',desc:'BAGGED AVEVE CHARCOAL RESTAURANT FSC 100 % 10 KG',kg:10,clients:['ESSEGE']},
+  {code:'61002AVVFSC5M2',desc:'BAGGED AVEVE CHARCOAL RESTAURANT FSC 100 % 10 KG',kg:10,clients:['ESSEGE']},
+  {code:'61002CAHYPR040FSC',desc:'BAGGED HYPER PROF RESTAURANT FSC 100 % 10 KG',kg:10,clients:['ESSEGE']},
+  {code:'61002CAREDG040FSC',desc:'RED GRILL RESTAURANT FSC 100% 10KG - 40 SACS',kg:10,clients:['ESSEGE']},
+  {code:'61002CAREDG040FSC5M2',desc:'RED GRILL RESTAURANT NOIR FSC 100% 10KG - 40 SACS 5M2',kg:10,clients:['ESSEGE']},
+  {code:'61002CHBPOLYFSC',desc:'CHARCOAL POLYPROPYLENE BAGS FSC 100 % 10 KG',kg:10,clients:['TAS']},
+  {code:'61002CUCUBAFSC',desc:'BAGGED CUBAX RESTAURANT FSC 100 % 10 KG',kg:10,clients:['ESSEGE']},
+  {code:'61002GABBYFSC',desc:'BAGGED GABBY RESTAURANT FSC 100 % 10 KG',kg:10,clients:['ESSEGE']},
+  {code:'61002GRILLGGFSC',desc:'BAGGED GRILL GRILL GRILL RESTAURANT FSC 100% 10 KG',kg:10,clients:['TAS']},
+  {code:'61002SCFRIE040FSC',desc:'BAGGED BBQ AND FRIENDS RESTAURANT FSC 100 % 10 KG',kg:10,clients:['ESSEGE']},
+  {code:'61003CAREDG072NAM',desc:'BAGGED RED GRILL CHARCOAL BRIQUETTE 10 KG - 72 SACS',kg:10,clients:['ESSEGE']},
+  {code:'61501CHBGCNSAFSC',desc:'BAGGED GREEN CHARCOAL SA FSC 100 % 15 L (3.5 KG) - 100 SACS',kg:3.5,clients:['Jack Pink Ltd']},
+  {code:'62001CHBPOLYFSC',desc:'CHARCOAL POLYPROPYLENE BAGS FSC 100 % 20 KG',kg:20,clients:['TAS']},
+  {code:'62002RSTPOLYFSC',desc:'RESTAURANT POLYPROPYLENE BAGS FSC 100 % 20 KG',kg:20,clients:['TAS']},
+  {code:'61501CHBPOLYFSC',desc:'CHARCOAL POLYPROPYLENE BAGS FSC 100 % 15 KG',kg:15,clients:['TAS']},
+  {code:'60001CHBFSC',desc:'BULK BAGS',kg:0,bulk:true,clients:['IBECOSOL']}
+];
+
+function getClientItems(k){if(!k)return ALL_ITEMS;return ALL_ITEMS.filter(i=>i.clients.includes(k));}
+function buildItemOptions(k){return getClientItems(k).map(i=>`<option value="${i.code}" data-kg="${i.kg}" data-desc="${i.desc}" ${i.bulk?'data-bulk="true"':''}>[${i.code}] ${i.desc}</option>`).join('');}
+function save(){localStorage.setItem(LOCAL_KEY,JSON.stringify(localData));}
+function showToast(msg,dur=2500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
+function setStatus(msg,type='success'){
+  const b=document.getElementById('status-bar');b.className='info-bar '+type;
+  const c=type==='success'?'#2d6a1a':type==='error'?'#c0392b':'#185FA5';
+  b.innerHTML=`<span>${msg}</span><a href="https://docs.google.com/spreadsheets" target="_blank" style="color:${c};font-weight:500;text-decoration:none">Open Sheet →</a>`;
+}
+async function callScript(payload){
+  const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload)});
+  const json=await res.json();
+  if(!json.success)throw new Error(json.message||'Error');
+  return json;
+}
+function showTab(name){
+  document.querySelectorAll('.tab').forEach((t,i)=>{t.classList.toggle('active',['bureau','terrain','suivi'][i]===name);});
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  if(name==='terrain')refreshBookingSelect();
+  if(name==='suivi')renderRecords();
+  if(name==='admin')renderAdmin();
+}
+function onClientSelect(){
+  const key=document.getElementById('b-client').value;
+  const box=document.getElementById('b-client-info');
+  if(key&&CLIENTS[key]){
+    const c=CLIENTS[key];
+    box.style.display='block';
+    box.innerHTML=`<strong>${c.name}</strong> · ${[c.addr1,c.addr2,c.country].filter(Boolean).join(', ')}${c.email?' · '+c.email:''}`;
+
+    // Auto-fill shipping line
+    const shippingSel=document.getElementById('b-shipping');
+    shippingSel.innerHTML='<option value="">-- Select --</option>';
+    (c.shippingLines||[]).forEach(s=>{
+      const o=document.createElement('option');o.value=s;o.textContent=s;shippingSel.appendChild(o);
+    });
+    // Add generic options
+    ['Maersk','MSC','CMA CGM','Hapag-Lloyd','Evergreen','PIL','Other'].forEach(s=>{
+      if(!(c.shippingLines||[]).includes(s)){
+        const o=document.createElement('option');o.value=s;o.textContent=s;shippingSel.appendChild(o);
+      }
+    });
+    if(c.shippingLines&&c.shippingLines.length===1) shippingSel.value=c.shippingLines[0];
+
+    // Auto-fill port of discharge — reset first
+    let destInput=document.getElementById('b-dest')||document.getElementById('b-dest-sel');
+    if(!destInput) destInput=document.getElementById('b-dest');
+    const destGroup=destInput.parentElement;
+    // Remove existing select if any
+    const existingSel=document.getElementById('b-dest-sel');
+    if(existingSel){
+      const inp=document.createElement('input');
+      inp.type='text';inp.id='b-dest';inp.placeholder='e.g. POINTE DES GALETS, REUNION';
+      inp.className=existingSel.className;
+      existingSel.parentElement.replaceChild(inp,existingSel);
+    }
+    // Replace input with select if multiple ports
+    if(c.ports&&c.ports.length>0){
+      let destSel=document.getElementById('b-dest-sel');
+      if(!destSel){
+        destSel=document.createElement('select');
+        destSel.id='b-dest-sel';
+        destSel.style.cssText=destInput.style.cssText;
+        destSel.className=destInput.className;
+        destGroup.replaceChild(destSel,destInput);
+      }
+      destSel.innerHTML='<option value="">-- Select port --</option>';
+      c.ports.forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;destSel.appendChild(o);});
+      if(c.ports.length===1) destSel.value=c.ports[0];
+      destSel.style.display='';
+    } else {
+      // Restore input
+      let destSel=document.getElementById('b-dest-sel');
+      if(destSel){
+        const inp=document.createElement('input');
+        inp.type='text';inp.id='b-dest';inp.placeholder='e.g. POINTE DES GALETS, REUNION';
+        inp.className=destSel.className;
+        destGroup.replaceChild(inp,destSel);
+      }
+    }
+  }else{
+    box.style.display='none';
+    // Reset shipping line
+    const shippingSel=document.getElementById('b-shipping');
+    shippingSel.innerHTML='<option value="">-- Select --</option>';
+    ['Maersk','MSC','CMA CGM','Hapag-Lloyd','Evergreen','PIL','Other'].forEach(s=>{
+      const o=document.createElement('option');o.value=s;o.textContent=s;shippingSel.appendChild(o);
+    });
+    // Restore port input
+    let destSel=document.getElementById('b-dest-sel');
+    if(destSel){
+      const inp=document.createElement('input');
+      inp.type='text';inp.id='b-dest';inp.placeholder='e.g. POINTE DES GALETS, REUNION';
+      inp.className=destSel.className;
+      destSel.parentElement.replaceChild(inp,destSel);
+    }
+  }
+}
+async function createBooking(){
+  const clientKey=document.getElementById('b-client').value;
+  const booking=document.getElementById('b-booking').value.trim();
+  if(!clientKey){showToast('Please select a client');return;}
+  if(!booking){showToast('Booking number is required');return;}
+  if(!/^EBKG\d{8}$/.test(booking)){showToast('Booking must be EBKG + 8 digits e.g. EBKG16945350');return;}
+  const bolVal=document.getElementById('b-bol').value.trim();
+  if(bolVal && !/^MEDUW\d{7}$/.test(bolVal)){showToast('BOL must be MEDUW + 7 digits e.g. MEDUW1211160');return;}
+  if(localData.bookings.find(b=>b.booking===booking)){showToast('Booking already exists');return;}
+  const client=CLIENTS[clientKey];
+  const nbContainers=parseInt(document.getElementById('b-containers').value)||0;
+  if(!nbContainers){showToast('Number of containers is required');return;}
+  const entry={id:Date.now(),clientKey,clientName:client.name,clientAddr1:client.addr1,clientAddr2:client.addr2,clientCountry:client.country,clientEmail:client.email,booking,
+    shipping:document.getElementById('b-shipping').value,bol:document.getElementById('b-bol').value.trim(),
+    vessel:document.getElementById('b-vessel').value.trim(),voyage:document.getElementById('b-voyage').value.trim(),
+    dest:(document.getElementById('b-dest-sel')||document.getElementById('b-dest')).value.trim(),open:document.getElementById('b-open').value,
+    close:document.getElementById('b-close').value,nbContainers,loads:[],createdAt:new Date().toISOString()};
+  localData.bookings.push(entry);save();
+  const btn=document.getElementById('btn-booking');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Saving...';
+  try{
+    await callScript({action:'addBooking',id:entry.id,client:entry.clientName,country:entry.clientCountry,
+      booking:entry.booking,shipping:entry.shipping,bol:entry.bol,vessel:entry.vessel,voyage:entry.voyage,
+      dest:entry.dest,open:entry.open,close:entry.close,nbContainers:entry.nbContainers,
+      clientAddr1:entry.clientAddr1,clientAddr2:entry.clientAddr2,clientEmail:entry.clientEmail,
+      createdAt:entry.createdAt});
+    setStatus('Synced to Google Sheets ✓','success');showToast('Booking '+booking+' created!');
+  }catch(e){setStatus('Saved locally — sync failed: '+e.message,'error');showToast('Saved locally');}
+  btn.disabled=false;btn.innerHTML='+ Create booking';
+  ['b-client','b-shipping','b-booking','b-bol','b-vessel','b-voyage','b-dest','b-open','b-close','b-containers'].forEach(id=>{
+    const el=document.getElementById(id);el.tagName==='SELECT'?el.selectedIndex=0:el.value='';
+  });
+  document.getElementById('b-client-info').style.display='none';
+}
+function refreshBookingSelect(){
+  const sel=document.getElementById('t-booking');
+  sel.innerHTML='<option value="">-- Select booking --</option>';
+  localData.bookings.forEach(b=>{
+    const loaded=b.loads.length;
+    const total=b.nbContainers||999;
+    if(loaded>=total) return; // booking complete - hide from dropdown
+    const o=document.createElement('option');
+    o.value=b.booking;
+    o.textContent=b.booking+' — '+b.clientName+(b.dest?' → '+b.dest:'')+' ('+loaded+'/'+total+')';
+    sel.appendChild(o);
+  });
+}
+// Map client name to client key for bookings loaded from Sheet
+function getClientKeyFromName(name){
+  if(!name) return '';
+  for(const key of Object.keys(CLIENTS)){
+    if(CLIENTS[key].name===name||key===name) return key;
+  }
+  return '';
+}
+
+function onBookingSelect(){
+  const bkgNum=document.getElementById('t-booking').value;
+  const bkg=localData.bookings.find(b=>b.booking===bkgNum);
+  document.getElementById('products-list').innerHTML='';productCount=0;updateTotals();
+  const info=document.getElementById('t-client-info');
+  if(bkg){
+    // Try clientKey first, then map from name
+    currentClient=bkg.clientKey||getClientKeyFromName(bkg.clientName)||'';
+    const count=getClientItems(currentClient).length;
+    info.style.display='block';
+    info.innerHTML=`👤 Client: <strong>${bkg.clientName}</strong> · ${bkg.clientCountry} — <strong>${count} products</strong> available`;
+  }
+  else{currentClient='';info.style.display='none';}
+}
+function addProduct(){
+  productCount++;const id='prod-'+productCount;
+  const div=document.createElement('div');div.className='product-row';div.id=id;
+  div.innerHTML=`<div class="product-grid">
+    <div class="form-group"><label>Product</label><select class="prod-select" onchange="onProductChange('${id}')"><option value="">-- Select --</option>${buildItemOptions(currentClient)}</select></div>
+    <div class="form-group"><label>Kg/bag</label><input type="text" class="prod-kgperbag" readonly style="background:#f5f5f3"></div>
+    <div class="form-group"><label>Bags</label><input type="number" class="prod-bags" placeholder="e.g. 1000" oninput="onBagsChange('${id}')"></div>
+    <div class="form-group"><label>Net (kg)</label><input type="number" class="prod-net" readonly style="background:#f5f5f3" oninput="updateTotals()"></div>
+    <div class="form-group"><label>&nbsp;</label><button class="btn btn-danger btn-sm" onclick="removeProduct('${id}')">✕</button></div>
+  </div>`;
+  document.getElementById('products-list').appendChild(div);
+}
+function onProductChange(id){
+  const row=document.getElementById(id);const sel=row.querySelector('.prod-select');const opt=sel.options[sel.selectedIndex];
+  const kg=parseFloat(opt.dataset.kg)||0;
+  const isBulk=opt.dataset.bulk==='true';
+  row.querySelector('.prod-kgperbag').value=isBulk?'Variable':kg?kg+' kg':'';
+  const netField=row.querySelector('.prod-net');
+  if(isBulk){netField.removeAttribute('readonly');netField.style.background='#fff';}
+  else{netField.setAttribute('readonly','');netField.style.background='#f5f5f3';}
+  const bags=parseFloat(row.querySelector('.prod-bags').value)||0;
+  if(!isBulk) netField.value=bags&&kg?Math.round(bags*kg):'';
+  updateTotals();
+}
+function onBagsChange(id){
+  const row=document.getElementById(id);const sel=row.querySelector('.prod-select');const opt=sel.options[sel.selectedIndex];
+  const kg=parseFloat(opt.dataset.kg)||0;const bags=parseFloat(row.querySelector('.prod-bags').value)||0;
+  const isBulk=opt.dataset.bulk==='true';
+  if(!isBulk) row.querySelector('.prod-net').value=bags&&kg?Math.round(bags*kg):'';
+  updateTotals();
+}
+function removeProduct(id){document.getElementById(id)?.remove();updateTotals();}
+function updateTotals(){
+  const rows=document.querySelectorAll('#products-list .product-row');
+  let tb=0,tn=0;
+  rows.forEach(r=>{tb+=(parseFloat(r.querySelector('.prod-bags').value)||0);tn+=(parseFloat(r.querySelector('.prod-net').value)||0);});
+  const tare=parseFloat(document.getElementById('t-tare').value)||0;
+  document.getElementById('t-net').value=tn||'';document.getElementById('t-gross').value=tn+tare||'';
+  const s=document.getElementById('net-summary');
+  if(rows.length>0){s.style.display='flex';document.getElementById('sum-bags').textContent=tb.toLocaleString();document.getElementById('sum-net').textContent=tn.toLocaleString()+' kg';document.getElementById('sum-gross').textContent=(tn+tare).toLocaleString()+' kg';document.getElementById('sum-prods').textContent=rows.length+' ref(s)';}
+  else{s.style.display='none';}
+}
+function getProducts(){
+  return Array.from(document.querySelectorAll('#products-list .product-row')).map(r=>{
+    const sel=r.querySelector('.prod-select');const opt=sel.options[sel.selectedIndex];
+    return{code:sel.value,desc:opt.dataset.desc||'',kgPerBag:parseFloat(opt.dataset.kg)||0,bags:parseFloat(r.querySelector('.prod-bags').value)||0,net:parseFloat(r.querySelector('.prod-net').value)||0,bulk:opt.dataset.bulk==='true'};
+  }).filter(p=>p.code);
+}
+async function submitLoad(){
+  const bkgNum=document.getElementById('t-booking').value;
+  const container=document.getElementById('t-container').value.trim();
+  const seal=document.getElementById('t-seal').value.trim();
+  const date=document.getElementById('t-date').value;
+  const packdate=document.getElementById('t-packdate').value;
+  const tare=document.getElementById('t-tare').value;
+  const temp=document.getElementById('t-temp').value;
+  const transporter=document.getElementById('t-transporter').value.trim();
+  const products=getProducts();
+
+  // ── GARDE-FOUS ──────────────────────────────────────────
+  if(!bkgNum){showToast('⚠️ Please select a booking');return;}
+  if(!container){showToast('⚠️ Container number is required');return;}
+  if(!seal){showToast('⚠️ Seal number is required');return;}
+  if(!date){showToast('⚠️ Loading date is required');return;}
+  if(!packdate){showToast('⚠️ Packaging date is required');return;}
+  if(!transporter){showToast('⚠️ Transporter is required');return;}
+  if(!tare){showToast('⚠️ Tare is required');return;}
+  if(!temp){showToast('⚠️ Temperature is required');return;}
+  if(products.length===0){showToast('⚠️ At least one product is required');return;}
+
+  // Container format: 4 letters + 7 digits
+  if(!/^[A-Za-z]{4}\d{7}$/.test(container)){
+    showToast('⚠️ Container number must be 4 letters + 7 digits (e.g. MEDU8773524)');return;
+  }
+
+  // Seal format: FX + 8 digits
+  if(!/^FX\d{8}$/.test(seal)){
+    showToast('⚠️ Seal number must be FX followed by 8 digits (e.g. FX40830347)');return;
+  }
+
+  // Tare: exactly 4 digits
+  if(!/^\d{4}$/.test(tare)){
+    showToast('⚠️ Tare must be exactly 4 digits');return;
+  }
+
+  // Temperature <= 36
+  if(parseFloat(temp)>36){
+    showToast('⚠️ Temperature cannot exceed 36°C');return;
+  }
+
+  // Loading date >= packaging date
+  if(date && packdate && date < packdate){
+    showToast('⚠️ Loading date cannot be before packaging date');return;
+  }
+
+  // All products must have bags > 0; bulk products must have net > 0
+  for(const p of products){
+    if(!p.bags||p.bags<=0){showToast('⚠️ Number of bags must be greater than 0 for all products');return;}
+    if(p.bulk&&(!p.net||p.net<=0)){showToast('⚠️ Net weight must be entered manually for BULK products');return;}
+  }
+  // ────────────────────────────────────────────────────────
+
+  const bkg=localData.bookings.find(b=>b.booking===bkgNum);if(!bkg)return;
+  const load={id:Date.now(),container,seal:document.getElementById('t-seal').value.trim(),date:document.getElementById('t-date').value,
+    packdate:document.getElementById('t-packdate').value,transporter:document.getElementById('t-transporter').value.trim(),
+    temp:document.getElementById('t-temp').value,tare:document.getElementById('t-tare').value,
+    net:document.getElementById('t-net').value,gross:document.getElementById('t-gross').value,products,loadedAt:new Date().toISOString()};
+  bkg.loads.push(load);save();
+  const base=[load.id,bkgNum,bkg.clientName,bkg.clientCountry,bkg.bol,bkg.vessel,bkg.voyage,load.container,load.seal,load.date,load.packdate,load.transporter,load.temp,load.tare,load.net,load.gross];
+  const rows=products.length===0?[[...base,'','',0,0,0,load.loadedAt]]:products.map(p=>[...base,p.code,p.desc,p.kgPerBag,p.bags,p.net,load.loadedAt]);
+  const btn=document.getElementById('btn-load');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Saving...';
+  try{await callScript({action:'addLoad',rows});setStatus('Synced to Google Sheets ✓','success');showToast('Loading saved!');}
+  catch(e){setStatus('Saved locally — sync failed: '+e.message,'error');showToast('Saved locally');}
+  btn.disabled=false;btn.innerHTML='✓ Validate loading';
+  ['t-container','t-seal','t-date','t-packdate','t-transporter','t-temp','t-tare','t-net','t-gross'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('t-booking').value='';document.getElementById('products-list').innerHTML='';
+  document.getElementById('net-summary').style.display='none';document.getElementById('t-client-info').style.display='none';
+  currentClient='';productCount=0;
+}
+function showSubTab(name){
+  document.querySelectorAll('.sub-tab').forEach((t,i)=>{t.classList.toggle('active',['in-progress','completed','clients-recap'][i]===name);});
+  document.querySelectorAll('.sub-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+}
+
+function buildBookingCard(b){
+  const isComplete=b.nbContainers&&b.loads.length>=b.nbContainers;
+  const cnt=b.nbContainers?(b.loads.length+'/'+b.nbContainers):String(b.loads.length);
+  const badge=isComplete?`<span class="badge badge-loaded">${cnt} ✓</span>`:`<span class="badge badge-pending">${cnt}</span>`;
+  const loadsHtml=b.loads.map(l=>{
+    const prods=l.products&&l.products.length>0?l.products.map(p=>`<span class="product-tag"><b>${p.code}</b> · ${p.bags} bags · ${p.net} kg</span>`).join(''):'';
+    return `<div style="background:#f9f9f7;border:0.5px solid #eee;border-radius:8px;padding:12px;margin-top:10px">
+      ${userRole==='admin'?`<div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:6px">
+        <button onclick="openEditLoadModal('${b.booking}','${l.id}')" style="background:#e8f0fe;color:#1a56c4;border:0.5px solid #c0d0f0;border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:500">✏️ Edit</button>
+        <button onclick="deleteLoadFromApp('${b.booking}','${l.id}')" style="background:#fef0f0;color:#c0392b;border:0.5px solid #f0c0bb;border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:500">🗑 Delete</button>
+      </div>`:''}
+      <div class="record-fields">
+        <div><div class="field-lbl">Container</div><div class="field-val">${l.container||'—'}</div></div>
+        <div><div class="field-lbl">Seal</div><div class="field-val">${l.seal||'—'}</div></div>
+        <div><div class="field-lbl">Date</div><div class="field-val">${l.date||'—'}</div></div>
+        <div><div class="field-lbl">Bags</div><div class="field-val">${l.products.reduce((a,p)=>a+(p.bags||0),0).toLocaleString()}</div></div>
+        <div><div class="field-lbl">Net (kg)</div><div class="field-val">${parseInt(l.net)||'—'}</div></div>
+        <div><div class="field-lbl">Gross (kg)</div><div class="field-val">${parseInt(l.gross)||'—'}</div></div>
+        <div><div class="field-lbl">Transporter</div><div class="field-val">${l.transporter||'—'}</div></div>
+        <div><div class="field-lbl">Temp</div><div class="field-val">${l.temp?l.temp+'°C':'—'}</div></div>
+        <div><div class="field-lbl">Refs</div><div class="field-val">${l.products.length} product(s)</div></div>
+      </div>${prods?`<div style="margin-top:8px">${prods}</div>`:''}
+    </div>`;}).join('');
+  const cardId='booking-'+b.booking.replace(/[^a-zA-Z0-9]/g,'');
+  return `<div class="record-card">
+    <div class="record-header">
+      <div><div class="record-booking">${b.booking}<span class="client-chip">${b.clientName}</span></div>
+      <div class="record-meta">${[b.shipping,b.vessel,b.voyage,b.dest].filter(Boolean).join(' · ')}</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${badge}
+        ${b.loads.length>0?`<button onclick="generatePackingList('${b.booking}')" style="background:#e8f0fe;color:#1a56c4;border:0.5px solid #c0d0f0;border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:500">📋 Packing List</button>`:''}
+        ${b.loads.length>0?`<button onclick="openAllDGCModal('${b.booking}')" style="background:#e8f5e2;color:#2d6a1a;border:0.5px solid #b8ddb0;border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:500">📄 All DGCs</button>`:''}
+        <button class="accordion-toggle" onclick="toggleAccordion('${cardId}')" title="Show/hide containers">▼</button>
+      </div>
+    </div>
+    <div class="record-fields">
+      <div><div class="field-lbl">Stack open</div><div class="field-val">${b.open||'—'}</div></div>
+      <div><div class="field-lbl">Stack close</div><div class="field-val">${b.close||'—'}</div></div>
+      <div><div class="field-lbl">Containers</div><div class="field-val">${b.loads.length}${b.nbContainers?' / '+b.nbContainers:''}</div></div>
+    </div>
+    <div id="${cardId}" class="accordion-body">${loadsHtml}</div>
+  </div>`;
+}
+
+function renderRecords(){
+  const allLoads=localData.bookings.flatMap(b=>b.loads);
+  const totalBags=allLoads.reduce((s,l)=>s+l.products.reduce((a,p)=>a+(p.bags||0),0),0);
+  const totalNet=allLoads.reduce((s,l)=>s+(parseFloat(l.net)||0),0);
+  document.getElementById('stat-bookings').textContent=localData.bookings.length;
+  document.getElementById('stat-loaded').textContent=allLoads.length;
+  document.getElementById('stat-bags').textContent=totalBags.toLocaleString();
+  document.getElementById('stat-weight').textContent=(totalNet/1000).toFixed(1);
+
+  if(!localData.bookings.length){
+    ['records-inprogress','records-completed','records-clients'].forEach(id=>{
+      document.getElementById(id).innerHTML='<div style="text-align:center;padding:40px;color:#aaa;font-size:14px">No data yet</div>';
+    });
+    return;
+  }
+
+  // In Progress
+  const inProgress=localData.bookings.filter(b=>!(b.nbContainers&&b.loads.length>=b.nbContainers));
+  document.getElementById('records-inprogress').innerHTML=inProgress.length
+    ?inProgress.slice().reverse().map(buildBookingCard).join('')
+    :'<div style="text-align:center;padding:40px;color:#aaa;font-size:14px">No bookings in progress</div>';
+
+  // Completed
+  const completed=localData.bookings.filter(b=>b.nbContainers&&b.loads.length>=b.nbContainers);
+  document.getElementById('records-completed').innerHTML=completed.length
+    ?completed.slice().reverse().map(buildBookingCard).join('')
+    :'<div style="text-align:center;padding:40px;color:#aaa;font-size:14px">No completed bookings yet</div>';
+
+  // Clients recap
+  const clientMap={};
+  localData.bookings.forEach(b=>{
+    const client=b.clientName||'Unknown';
+    if(!clientMap[client]) clientMap[client]={totalNet:0,totalBags:0,products:{}};
+    b.loads.forEach(l=>{
+      clientMap[client].totalNet+=(parseFloat(l.net)||0);
+      l.products.forEach(p=>{
+        const key=p.desc||p.code;
+        if(!clientMap[client].products[key]) clientMap[client].products[key]={bags:0,net:0};
+        clientMap[client].products[key].bags+=(p.bags||0);
+        clientMap[client].products[key].net+=(p.net||0);
+        clientMap[client].totalBags+=(p.bags||0);
+      });
+    });
+  });
+
+  const clientsHtml=Object.entries(clientMap).map(([client,data])=>{
+    const productsHtml=Object.entries(data.products).map(([desc,pdata])=>`
+      <div class="product-recap-row">
+        <span style="color:#555;font-size:12px">${desc}</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="color:#888;font-size:12px">${pdata.bags.toLocaleString()} bags</span>
+          <span class="tonnage-badge">${(pdata.net/1000).toFixed(2)} t</span>
+        </div>
+      </div>`).join('');
+    return `<div class="client-recap-card">
+      <div class="client-recap-header">
+        <span>${client}</span>
+        <span class="tonnage-badge" style="font-size:13px">Total: ${(data.totalNet/1000).toFixed(2)} t</span>
+      </div>
+      ${productsHtml}
+    </div>`;
+  }).join('');
+
+  document.getElementById('records-clients').innerHTML=clientsHtml||'<div style="text-align:center;padding:40px;color:#aaa;font-size:14px">No data yet</div>';
+}
+// ── PHOTO ANALYSIS ──────────────────────────────────────
+function triggerPhoto(type){
+  document.getElementById('photo-'+type).click();
+}
+
+async function analyzePhoto(type){
+  const input=document.getElementById('photo-'+type);
+  const file=input.files[0];
+  if(!file) return;
+
+  const btn=document.querySelector(`button[onclick="triggerPhoto('${type}')"]`);
+  const status=document.getElementById(type+'-photo-status');
+  btn.classList.add('loading');
+  btn.textContent='⏳ Analyzing...';
+  status.textContent='';
+
+  try{
+    // Convert image to base64
+    const base64=await new Promise((res,rej)=>{
+      const reader=new FileReader();
+      reader.onload=()=>res(reader.result.split(',')[1]);
+      reader.onerror=rej;
+      reader.readAsDataURL(file);
+    });
+
+    const mediaType=file.type||'image/jpeg';
+
+    let prompt = '';
+    if(type==='container'){
+      prompt = `This is a photo of a shipping container door. Look at the RIGHT door panel where specs are written.
+
+Extract:
+1. Container number: it appears at the TOP of the right door, format is 4 letters + 6 digits + 1 check digit. They may be on two lines e.g. "TCNU 192071" on one line and "3" on the next — combine them as "TCNU1920713". Always 4 letters + 7 digits total.
+2. Tare weight in KG: look for the word "TARE" followed by a number and "KGS". Extract only the number (e.g. if you see "TARE 3.700 KGS" return "3700", remove the dot).
+
+Respond ONLY in this exact JSON, no other text:
+{"container": "TCNU1920713", "tare": "3700"}
+
+If you cannot find a value, use empty string "".`;
+    } else {
+      prompt = `This is a photo of a shipping container seal. Find the seal number which starts with "FX" followed by 8 digits (e.g. FX40830347). It is usually printed or stamped on the metal seal itself.
+
+Respond ONLY in this exact JSON, no other text:
+{"seal": "FX12345678"}
+
+If you cannot find it, use empty string "".`;
+    }
+
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'analyzeImage',
+        imageData: base64,
+        mediaType: mediaType,
+        prompt: prompt
+      })
+    });
+
+    const data = await response.json();
+    if(!data.success) throw new Error(data.message||'Analysis failed');
+    const text = data.text.trim().replace(/```json\n?/g,'').replace(/```/g,'').trim();
+    const result = JSON.parse(text);
+
+    if(type==='container'){
+      if(result.container) document.getElementById('t-container').value=result.container;
+      if(result.tare) document.getElementById('t-tare').value=result.tare;
+      updateTotals();
+      status.textContent = '✅ Container: '+( result.container||'?')+' · Tare: '+(result.tare||'?')+' kg';
+      status.style.color='#2d6a1a';
+    } else {
+      if(result.seal) document.getElementById('t-seal').value=result.seal;
+      status.textContent = '✅ Seal: '+(result.seal||'?');
+      status.style.color='#2d6a1a';
+    }
+
+  } catch(e){
+    status.textContent = '❌ Error: ' + e.message;
+    status.style.color='#c0392b';
+  }
+
+  btn.classList.remove('loading');
+  btn.textContent = type==='container'?'📷 Scan container':'📷 Scan seal';
+  input.value='';
+}
+// ────────────────────────────────────────────────────────
+
+// ── PIN AUTH ────────────────────────────────────────────
+const PIN_BUREAU = '1234';
+const PIN_TERRAIN = '2050';
+const PIN_ADMIN = '2512';
+let userRole = '';
+
+function nextPin(el, nextId){
+  if(el.value.length===1 && nextId){
+    document.getElementById(nextId).focus();
+  }
+  if(!nextId){
+    // Last digit entered - auto check
+    setTimeout(checkPin, 100);
+  }
+}
+
+function pinBack(e, el, prevId){
+  if(e.key==='Backspace' && el.value==='' && prevId){
+    document.getElementById(prevId).focus();
+  }
+}
+
+function checkPin(){
+  const pin = ['p1','p2','p3','p4'].map(id=>document.getElementById(id).value).join('');
+  if(pin === PIN_BUREAU){
+    userRole = 'bureau';
+    document.getElementById('login-overlay').style.display='none';
+    document.getElementById('role-indicator').innerHTML='<span class="role-badge bureau">Office</span>';
+    showTab('bureau');
+    init();
+  } else if(pin === PIN_TERRAIN){
+    userRole = 'terrain';
+    document.getElementById('login-overlay').style.display='none';
+    document.getElementById('role-indicator').innerHTML='<span class="role-badge terrain">Field</span>';
+    document.querySelectorAll('.tab')[0].style.display='none';
+    document.querySelectorAll('.tab')[2].style.display='none';
+    document.querySelectorAll('.tab')[3].style.display='none';
+    showTab('terrain');
+    init();
+  } else if(pin === PIN_ADMIN){
+    userRole = 'admin';
+    document.getElementById('login-overlay').style.display='none';
+    document.getElementById('role-indicator').innerHTML='<span class="role-badge" style="background:#fce8f0;color:#a0185f">Admin</span>';
+    // Show admin tab
+    document.querySelectorAll('.tab')[3].style.display='';
+    showTab('bureau');
+    init();
+  } else {
+    document.getElementById('pin-error').textContent='❌ Incorrect PIN';
+    ['p1','p2','p3','p4'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('p1').focus();
+    setTimeout(()=>document.getElementById('pin-error').textContent='', 2000);
+  }
+}
+// ────────────────────────────────────────────────────────
+
+function renderAdmin(){
+  const list=document.getElementById('admin-bookings-list');
+  if(!localData.bookings.length){
+    list.innerHTML='<div style="text-align:center;padding:20px;color:#aaa;font-size:14px">No bookings</div>';
+    return;
+  }
+  list.innerHTML=localData.bookings.slice().reverse().map(b=>{
+    const isComplete=b.nbContainers&&b.loads.length>=b.nbContainers;
+    const status=isComplete?'Complete':'In progress ('+b.loads.length+'/'+(b.nbContainers||'?')+')';
+    return `<div style="background:#fff;border:0.5px solid #e0e0e0;border-radius:10px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-weight:500;font-size:14px">${b.booking} <span class="client-chip">${b.clientName}</span></div>
+        <div style="font-size:12px;color:#888;margin-top:3px">${[b.vessel,b.dest].filter(Boolean).join(' · ')} · ${status}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button onclick="openEditModal('${b.booking}')" style="background:#e8f0fe;color:#1a56c4;border:0.5px solid #c0d0f0;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:500">✏️ Edit</button>
+        <button onclick="deleteBooking('${b.booking}')" style="background:#fef0f0;color:#c0392b;border:0.5px solid #f0c0bb;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:500">🗑 Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function deleteBooking(bookingNum){
+  if(!confirm('Delete booking '+bookingNum+' and all its loads? This cannot be undone.')) return;
+  localData.bookings=localData.bookings.filter(b=>b.booking!==bookingNum);
+  save();
+  renderAdmin();
+  showToast('Booking '+bookingNum+' deleted');
+}
+
+function openEditModal(bookingNum){
+  const b=localData.bookings.find(b=>b.booking===bookingNum);
+  if(!b) return;
+  document.getElementById('edit-booking-key').value=bookingNum;
+  document.getElementById('edit-booking-label').textContent=bookingNum;
+  document.getElementById('edit-client').value=b.clientKey||getClientKeyFromName(b.clientName)||'';
+  document.getElementById('edit-shipping').value=b.shipping||'';
+  document.getElementById('edit-vessel').value=b.vessel||'';
+  document.getElementById('edit-voyage').value=b.voyage||'';
+  document.getElementById('edit-bol').value=b.bol||'';
+  document.getElementById('edit-dest').value=b.dest||'';
+  document.getElementById('edit-containers').value=b.nbContainers||'';
+  document.getElementById('edit-open').value=b.open||'';
+  document.getElementById('edit-close').value=b.close||'';
+  document.getElementById('edit-modal').style.display='flex';
+}
+
+function closeEditModal(){
+  document.getElementById('edit-modal').style.display='none';
+}
+
+async function saveEditBooking(){
+  const bookingNum=document.getElementById('edit-booking-key').value;
+  const b=localData.bookings.find(b=>b.booking===bookingNum);
+  if(!b) return;
+  const newClientKey=document.getElementById('edit-client').value;
+  if(newClientKey&&CLIENTS[newClientKey]){
+    const c=CLIENTS[newClientKey];
+    b.clientKey=newClientKey;
+    b.clientName=c.name;
+    b.clientCountry=c.country;
+    b.clientAddr1=c.addr1;
+    b.clientAddr2=c.addr2;
+    b.clientEmail=c.email;
+  }
+  b.shipping=document.getElementById('edit-shipping').value.trim();
+  b.vessel=document.getElementById('edit-vessel').value.trim();
+  b.voyage=document.getElementById('edit-voyage').value.trim();
+  b.bol=document.getElementById('edit-bol').value.trim();
+  b.dest=document.getElementById('edit-dest').value.trim();
+  const nc=parseInt(document.getElementById('edit-containers').value);
+  if(nc>0) b.nbContainers=nc;
+  b.open=document.getElementById('edit-open').value;
+  b.close=document.getElementById('edit-close').value;
+  save();
+  const btn=document.getElementById('btn-save-edit');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Saving...';
+  try{
+    await callScript({action:'updateBooking',
+      booking:bookingNum,
+      client:b.clientName,country:b.clientCountry,
+      shipping:b.shipping,vessel:b.vessel,voyage:b.voyage,
+      bol:b.bol,dest:b.dest,nbContainers:b.nbContainers,
+      open:b.open,close:b.close,
+      clientAddr1:b.clientAddr1,clientAddr2:b.clientAddr2,clientEmail:b.clientEmail
+    });
+    showToast('Booking updated!');
+    setStatus('Synced to Google Sheets ✓','success');
+  }catch(e){
+    showToast('Saved locally — sync failed');
+    setStatus('Saved locally — sync failed: '+e.message,'error');
+  }
+  btn.disabled=false;btn.innerHTML='💾 Save changes';
+  closeEditModal();
+  renderAdmin();
+}
+
+function fmtDate(d){
+  if(!d) return '';
+  const dt=new Date(d);
+  return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'});
+}
+
+function toggleAccordion(id){
+  const body=document.getElementById(id);
+  const btn=body.previousElementSibling.previousElementSibling.querySelector('.accordion-toggle');
+  if(!body||!btn) return;
+  body.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+
+async function generatePackingList(bookingNum){
+  const b=localData.bookings.find(b=>b.booking===bookingNum);
+  if(!b||!b.loads.length){showToast('No loads found for this booking');return;}
+
+  const wb=new ExcelJS.Workbook();
+  const ws=wb.addWorksheet('Container List');
+
+  // Column widths (A skipped, table is B..K)
+  const widths=[2,21,20,16,18,18,55,13,16,14,8];
+  widths.forEach((w,i)=>{ws.getColumn(i+1).width=w;});
+
+  const thin={top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}};
+  const bold={bold:true};
+
+  // Header info rows
+  ws.getCell('B4').value='Vessel: '; ws.getCell('B4').font=bold;
+  ws.getCell('C4').value=b.vessel||''; ws.getCell('C4').font=bold;
+  ws.getCell('D4').value='Voyage number: '+(b.voyage||''); ws.getCell('D4').font=bold;
+  ws.getCell('G4').value='STACK - OPEN: '+fmtDate(b.open)+'  CLOSE: '+fmtDate(b.close); ws.getCell('G4').font=bold;
+  ws.getCell('B5').value='BOL'; ws.getCell('B5').font=bold;
+  ws.getCell('C5').value=b.bol||''; ws.getCell('C5').font=bold;
+  ws.getCell('G5').value='BOOKING: '+b.booking; ws.getCell('G5').font=bold;
+
+  // Column headers row 6 (with borders)
+  ['Container','Seal','Date loading','Transporter','Product code','Product','BOL Weight','Number of Bags','Gross weight','Tare'].forEach((h,i)=>{
+    const c=ws.getCell(6,i+2);
+    c.value=h; c.font=bold; c.alignment={horizontal:'center',vertical:'middle',wrapText:true}; c.border=thin;
+  });
+
+  // Data rows — 2 rows per container
+  // Merged: B(container), C(seal), D(date), E(transporter), H(net), J(gross), K(tare)
+  // NOT merged: F(product code), G(product desc), I(bags)
+  let totalNet=0,totalBags=0,totalGross=0;
+  let currentRow=7;
+  b.loads.forEach((l)=>{
+    const prods=l.products&&l.products.length>0?l.products:[{code:'',desc:'',bags:0,net:0}];
+    const tare=parseFloat(l.tare)||0;
+    const gross=parseFloat(l.gross)||0;
+    const lNet=parseFloat(l.net)||0;
+    totalGross+=gross; totalNet+=lNet;
+    totalBags+=prods.reduce((a,p)=>a+(parseFloat(p.bags)||0),0);
+    const p1=prods[0]||{code:'',desc:'',bags:''};
+    const p2=prods.length>1?prods[1]:{code:'',desc:'',bags:''};
+    const row1=currentRow, row2=currentRow+1;
+
+    // Merged cols (container-level)
+    [{col:2,val:l.container||''},{col:3,val:l.seal||''},
+     {col:4,val:fmtDate(l.date)},{col:5,val:l.transporter||''},
+     {col:8,val:lNet},{col:10,val:gross},{col:11,val:tare}
+    ].forEach(({col,val})=>{
+      ws.mergeCells(row1,col,row2,col);
+      const c=ws.getCell(row1,col);
+      c.value=val; c.alignment={horizontal:'center',vertical:'middle'}; c.border=thin;
+    });
+
+    // Product row 1 (non-merged)
+    [{col:6,val:p1.code||''},{col:7,val:p1.desc||''},{col:9,val:parseFloat(p1.bags)||''}]
+    .forEach(({col,val})=>{
+      const c=ws.getCell(row1,col);
+      c.value=val; c.alignment={horizontal:'center',vertical:'middle'}; c.border=thin;
+    });
+
+    // Product row 2 (non-merged — empty if only 1 product)
+    [{col:6,val:p2.code||''},{col:7,val:p2.desc||''},{col:9,val:prods.length>1?(parseFloat(p2.bags)||''):''}]
+    .forEach(({col,val})=>{
+      const c=ws.getCell(row2,col);
+      c.value=val; c.alignment={horizontal:'center',vertical:'middle'}; c.border=thin;
+    });
+
+    currentRow+=2;
+  });
+
+  // Totals row (bordered)
+  const totalRow=currentRow;
+  for(let col=2;col<=11;col++){ ws.getCell(totalRow,col).border=thin; }
+  ws.getCell(totalRow,8).value=totalNet; ws.getCell(totalRow,8).font=bold; ws.getCell(totalRow,8).alignment={horizontal:'center'};
+  ws.getCell(totalRow,9).value=totalBags; ws.getCell(totalRow,9).font=bold; ws.getCell(totalRow,9).alignment={horizontal:'center'};
+  ws.getCell(totalRow,10).value=totalGross; ws.getCell(totalRow,10).font=bold; ws.getCell(totalRow,10).alignment={horizontal:'center'};
+
+  const buf=await wb.xlsx.writeBuffer();
+  const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='PackingList_'+b.booking+'.xlsx';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Packing list downloaded!');
+}
+
+let allDGCBookingNum = '';
+
+function openAllDGCModal(bookingNum){
+  allDGCBookingNum = bookingNum;
+  document.getElementById('alldgc-booking-label').textContent = bookingNum;
+  document.getElementById('alldgc-decldate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('alldgc-proddate').value = '';
+  document.getElementById('alldgc-modal').style.display = 'flex';
+}
+
+function closeAllDGCModal(){
+  document.getElementById('alldgc-modal').style.display = 'none';
+}
+
+async function submitAllDGCs(){
+  const b = localData.bookings.find(b=>b.booking===allDGCBookingNum);
+  if(!b||!b.loads.length) return;
+  const proddate = document.getElementById('alldgc-proddate').value;
+  const decldate = document.getElementById('alldgc-decldate').value;
+  if(!decldate){showToast('Declaration date is required');return;}
+
+  const btn = document.getElementById('btn-alldgc');
+  btn.disabled=true;
+
+  const spin='<span class="spinner" style="border-color:rgba(255,255,255,0.3);border-top-color:#fff"></span>';
+  const bookingInfo = {
+    booking: b.booking, bol: b.bol, vessel: b.vessel, voyage: b.voyage,
+    dest: b.dest, clientName: b.clientName, clientAddr1: b.clientAddr1,
+    clientAddr2: b.clientAddr2, clientCountry: b.clientCountry,
+    proddate, decldate
+  };
+
+  try{
+    const zip = new JSZip();
+    for(let i=0;i<b.loads.length;i++){
+      btn.innerHTML = spin+'Generating '+(i+1)+'/'+b.loads.length+'...';
+      const res = await fetch(SCRIPT_URL, {method:'POST', body: JSON.stringify({
+        action: 'generateOneDGC',
+        booking: bookingInfo,
+        load: b.loads[i]
+      })});
+      const raw = await res.text();
+      let json;
+      try { json = JSON.parse(raw); }
+      catch(parseErr){
+        console.warn('Container '+b.loads[i].container+' : server error HTTP '+res.status);
+        continue; // skip this container, continue with others
+      }
+      if(!json.success){
+        console.warn('Container '+b.loads[i].container+' failed: '+json.message);
+        continue; // skip and continue
+      }
+      zip.file(json.filename, json.data, {base64:true});
+    }
+    btn.innerHTML = spin+'Zipping...';
+    const blob = await zip.generateAsync({type:'blob'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href=url; a.download='DGCs_'+b.booking+'.zip';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+    showToast('All DGCs downloaded!');
+    closeAllDGCModal();
+  } catch(e){
+    showToast('Error: '+e.message);
+  }
+  btn.disabled=false; btn.innerHTML='⬇ Download all DGCs';
+}
+
+// ── LOAD EDIT / DELETE ──────────────────────────────────
+let editloadProdCount=0;
+let editloadClientKey='';
+
+function openEditLoadModal(bkgNum, loadId){
+  const b=localData.bookings.find(x=>x.booking===bkgNum); if(!b) return;
+  const l=b.loads.find(x=>String(x.id)===String(loadId)); if(!l) return;
+  editloadClientKey=b.clientKey||getClientKeyFromName(b.clientName)||'';
+  document.getElementById('editload-bkg').value=bkgNum;
+  document.getElementById('editload-id').value=loadId;
+  document.getElementById('editload-container-label').textContent=l.container||'';
+  document.getElementById('editload-container').value=l.container||'';
+  document.getElementById('editload-seal').value=l.seal||'';
+  document.getElementById('editload-date').value=l.date||'';
+  document.getElementById('editload-packdate').value=l.packdate||'';
+  document.getElementById('editload-transporter').value=l.transporter||'';
+  document.getElementById('editload-temp').value=l.temp||'';
+  document.getElementById('editload-tare').value=l.tare||'';
+  document.getElementById('editload-products').innerHTML='';
+  editloadProdCount=0;
+  if(l.products&&l.products.length) l.products.forEach(p=>editloadAddProduct(p.code,p.bags));
+  else editloadAddProduct();
+  editloadTotals();
+  document.getElementById('editload-modal').style.display='flex';
+}
+
+function closeEditLoadModal(){ document.getElementById('editload-modal').style.display='none'; }
+
+function editloadAddProduct(code='', bags=''){
+  editloadProdCount++;
+  const id='elprod-'+editloadProdCount;
+  const div=document.createElement('div');
+  div.className='product-row'; div.id=id;
+  div.innerHTML=`<div class="product-grid">
+    <div class="form-group"><label>Product</label><select class="elprod-select" onchange="editloadProdChange('${id}')"><option value="">-- Select --</option>${buildItemOptions(editloadClientKey)}</select></div>
+    <div class="form-group"><label>Kg/bag</label><input type="text" class="elprod-kg" readonly style="background:#f5f5f3"></div>
+    <div class="form-group"><label>Bags</label><input type="number" class="elprod-bags" oninput="editloadProdChange('${id}')"></div>
+    <div class="form-group"><label>Net (kg)</label><input type="number" class="elprod-net" readonly style="background:#f5f5f3" oninput="editloadTotals()"></div>
+    <div class="form-group"><label>&nbsp;</label><button class="btn btn-danger btn-sm" onclick="document.getElementById('${id}').remove();editloadTotals()">✕</button></div>
+  </div>`;
+  document.getElementById('editload-products').appendChild(div);
+  if(code) div.querySelector('.elprod-select').value=code;
+  if(bags!=='') div.querySelector('.elprod-bags').value=bags;
+  editloadProdChange(id);
+}
+
+function editloadProdChange(id){
+  const row=document.getElementById(id); if(!row) return;
+  const sel=row.querySelector('.elprod-select'); const opt=sel.options[sel.selectedIndex];
+  const kg=parseFloat(opt&&opt.dataset.kg)||0;
+  const isBulk=opt&&opt.dataset.bulk==='true';
+  row.querySelector('.elprod-kg').value=isBulk?'Variable':kg?kg+' kg':'';
+  const netField=row.querySelector('.elprod-net');
+  if(isBulk){netField.removeAttribute('readonly');netField.style.background='#fff';}
+  else{netField.setAttribute('readonly','');netField.style.background='#f5f5f3';}
+  const bags=parseFloat(row.querySelector('.elprod-bags').value)||0;
+  if(!isBulk) netField.value=bags&&kg?Math.round(bags*kg):'';
+  editloadTotals();
+}
+
+function editloadTotals(){
+  let tn=0;
+  document.querySelectorAll('#editload-products .product-row').forEach(r=>{tn+=parseFloat(r.querySelector('.elprod-net').value)||0;});
+  const tare=parseFloat(document.getElementById('editload-tare').value)||0;
+  document.getElementById('editload-net').textContent=tn.toLocaleString()+' kg';
+  document.getElementById('editload-gross').textContent=(tn+tare).toLocaleString()+' kg';
+}
+
+function getEditLoadProducts(){
+  return Array.from(document.querySelectorAll('#editload-products .product-row')).map(r=>{
+    const sel=r.querySelector('.elprod-select'); const opt=sel.options[sel.selectedIndex];
+    return {code:sel.value,desc:(opt&&opt.dataset.desc)||'',kgPerBag:parseFloat(opt&&opt.dataset.kg)||0,bags:parseFloat(r.querySelector('.elprod-bags').value)||0,net:parseFloat(r.querySelector('.elprod-net').value)||0};
+  }).filter(p=>p.code);
+}
+
+async function saveEditLoad(){
+  const bkgNum=document.getElementById('editload-bkg').value;
+  const loadId=document.getElementById('editload-id').value;
+  const b=localData.bookings.find(x=>x.booking===bkgNum); if(!b) return;
+  const l=b.loads.find(x=>String(x.id)===String(loadId)); if(!l) return;
+  const container=document.getElementById('editload-container').value.trim();
+  const seal=document.getElementById('editload-seal').value.trim();
+  const products=getEditLoadProducts();
+  if(!container){showToast('⚠️ Container is required');return;}
+  if(products.length===0){showToast('⚠️ At least one product is required');return;}
+  for(const p of products){ if(!p.bags||p.bags<=0){showToast('⚠️ Bags must be > 0 for all products');return;} }
+  const tare=parseFloat(document.getElementById('editload-tare').value)||0;
+  const net=products.reduce((a,p)=>a+(p.net||0),0);
+  l.container=container;
+  l.seal=seal;
+  l.date=document.getElementById('editload-date').value;
+  l.packdate=document.getElementById('editload-packdate').value;
+  l.transporter=document.getElementById('editload-transporter').value.trim();
+  l.temp=document.getElementById('editload-temp').value;
+  l.tare=String(tare);
+  l.net=String(net);
+  l.gross=String(net+tare);
+  l.products=products;
+  save();
+  const base=[l.id,bkgNum,b.clientName,b.clientCountry,b.bol,b.vessel,b.voyage,l.container,l.seal,l.date,l.packdate,l.transporter,l.temp,l.tare,l.net,l.gross];
+  const rows=products.map(p=>[...base,p.code,p.desc,p.kgPerBag,p.bags,p.net,l.loadedAt||new Date().toISOString()]);
+  const btn=document.getElementById('btn-save-editload'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Saving...';
+  try{ await callScript({action:'updateLoad',loadId:l.id,rows}); showToast('Load updated!'); setStatus('Synced to Google Sheets ✓','success'); }
+  catch(e){ showToast('Saved locally — sync failed'); setStatus('Saved locally — sync failed: '+e.message,'error'); }
+  btn.disabled=false; btn.innerHTML='💾 Save';
+  closeEditLoadModal(); renderRecords();
+}
+
+async function deleteLoadFromApp(bkgNum, loadId){
+  if(!confirm('Delete this container/load? This cannot be undone.')) return;
+  const b=localData.bookings.find(x=>x.booking===bkgNum); if(!b) return;
+  b.loads=b.loads.filter(x=>String(x.id)!==String(loadId));
+  save();
+  try{ await callScript({action:'deleteLoad',loadId:loadId}); showToast('Load deleted'); setStatus('Synced to Google Sheets ✓','success'); }
+  catch(e){ showToast('Deleted locally — sync failed'); setStatus('Saved locally — sync failed: '+e.message,'error'); }
+  renderRecords();
+}
+// ────────────────────────────────────────────────────────
+
+async function refreshFromSheet(){
+  const btn=document.getElementById('btn-refresh');
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner" style="border-color:rgba(0,0,0,0.15);border-top-color:#555"></span> Syncing...';}
+  try{
+    await callScript({action:'init'});
+    const res=await callScript({action:'getBookings'});
+    if(res.bookings&&res.bookings.length>0){
+      res.bookings.forEach(row=>{
+        const bkgNum=row['Booking Number'];
+        if(!bkgNum) return;
+        const sheetNb=parseInt(row['Number of Containers'])||0;
+        const exists=localData.bookings.find(b=>b.booking===bkgNum);
+        if(!exists){
+          localData.bookings.push({
+            id:row['ID']||Date.now(),clientKey:'',clientName:row['Client']||'',
+            clientAddr1:'',clientAddr2:'',clientCountry:row['Country']||'',clientEmail:'',
+            booking:bkgNum,shipping:row['Shipping Line']||'',bol:row['BOL']||'',
+            vessel:row['Vessel']||'',voyage:row['Voyage No']||'',dest:row['Port of Discharge']||'',
+            open:row['Stack Opening']||'',close:row['Stack Close']||'',
+            nbContainers:sheetNb,loads:[],createdAt:row['Created At']||''
+          });
+        } else {
+          if(sheetNb>0) exists.nbContainers=sheetNb;
+          if(row['Vessel']) exists.vessel=row['Vessel'];
+          if(row['Voyage No']) exists.voyage=row['Voyage No'];
+          if(row['BOL']) exists.bol=row['BOL'];
+          if(row['Port of Discharge']) exists.dest=row['Port of Discharge'];
+          if(exists.nbContainers>0&&sheetNb===0){
+            callScript({action:'updateBooking',booking:bkgNum,nbContainers:exists.nbContainers,
+              vessel:exists.vessel,voyage:exists.voyage,bol:exists.bol,dest:exists.dest,
+              open:exists.open,close:exists.close,client:exists.clientName,country:exists.clientCountry,
+              shipping:exists.shipping,clientAddr1:exists.clientAddr1,clientAddr2:exists.clientAddr2,clientEmail:exists.clientEmail
+            }).catch(()=>{});
+          }
+        }
+      });
+    }
+    const loadsRes=await callScript({action:'getLoads'});
+    if(loadsRes.loads&&loadsRes.loads.length>0){
+      loadsRes.loads.forEach(sl=>{
+        if(!sl.booking) return;
+        const bkg=localData.bookings.find(b=>b.booking===sl.booking);
+        if(!bkg) return;
+        const exists=bkg.loads.find(l=>String(l.id)===String(sl.id)||l.container===sl.container);
+        if(!exists){
+          bkg.loads.push({id:sl.id,container:sl.container||'',seal:sl.seal||'',date:sl.date||'',
+            packdate:sl.packdate||'',transporter:sl.transporter||'',temp:sl.temp||'',
+            tare:sl.tare||'',net:sl.net||'',gross:sl.gross||'',
+            products:(sl.products||[]).map(p=>({code:p.code,desc:p.desc,kgPerBag:p.kgPerBag,bags:p.bags,net:p.net})),
+            loadedAt:sl.loadedAt||''});
+        }
+      });
+    }
+    save();
+    renderRecords();
+    setStatus('Synced from Sheet ✓','success');
+    showToast('Data refreshed!');
+  }catch(e){
+    showToast('Sync failed: '+e.message);
+    setStatus('Sync failed','error');
+  }
+  if(btn){btn.disabled=false;btn.innerHTML='🔄 Refresh from Sheet';}
+}
+
+async function init(){
+  try{
+    await callScript({action:'init'});
+    setStatus('Connected to Google Sheets ✓','success');
+    // Load bookings from Sheet
+    const res=await callScript({action:'getBookings'});
+    if(res.bookings&&res.bookings.length>0){
+      res.bookings.forEach(row=>{
+        const bkgNum=row['Booking Number'];
+        if(!bkgNum) return;
+        const exists=localData.bookings.find(b=>b.booking===bkgNum);
+        const sheetNb=parseInt(row['Number of Containers'])||0;
+        if(!exists){
+          // New booking from Sheet — push it
+          localData.bookings.push({
+            id:row['ID']||Date.now(),
+            clientKey:'',
+            clientName:row['Client']||'',
+            clientAddr1:'',clientAddr2:'',
+            clientCountry:row['Country']||'',
+            clientEmail:'',
+            booking:bkgNum,
+            shipping:row['Shipping Line']||'',
+            bol:row['BOL']||'',
+            vessel:row['Vessel']||'',
+            voyage:row['Voyage No']||'',
+            dest:row['Port of Discharge']||'',
+            open:row['Stack Opening']||'',
+            close:row['Stack Close']||'',
+            nbContainers:sheetNb,
+            loads:[],
+            createdAt:row['Created At']||''
+          });
+        } else {
+          // Existing booking — sync key fields from Sheet
+          if(sheetNb>0) exists.nbContainers=sheetNb;
+          if(row['Vessel']) exists.vessel=row['Vessel'];
+          if(row['Voyage No']) exists.voyage=row['Voyage No'];
+          if(row['BOL']) exists.bol=row['BOL'];
+          if(row['Port of Discharge']) exists.dest=row['Port of Discharge'];
+          if(row['Stack Opening']) exists.open=row['Stack Opening'];
+          if(row['Stack Close']) exists.close=row['Stack Close'];
+          // If local has nbContainers but Sheet doesn't yet → push to Sheet silently
+          if(exists.nbContainers>0 && sheetNb===0){
+            callScript({action:'updateBooking',booking:bkgNum,
+              nbContainers:exists.nbContainers,vessel:exists.vessel,voyage:exists.voyage,
+              bol:exists.bol,dest:exists.dest,open:exists.open,close:exists.close,
+              client:exists.clientName,country:exists.clientCountry,shipping:exists.shipping,
+              clientAddr1:exists.clientAddr1,clientAddr2:exists.clientAddr2,clientEmail:exists.clientEmail
+            }).catch(()=>{});
+          }
+        }
+      });
+      save();
+    }
+    // Load loads from Sheet (so loads entered by others show up)
+    const loadsRes=await callScript({action:'getLoads'});
+    if(loadsRes.loads&&loadsRes.loads.length>0){
+      loadsRes.loads.forEach(sl=>{
+        if(!sl.booking) return;
+        const bkg=localData.bookings.find(b=>b.booking===sl.booking);
+        if(!bkg) return;
+        const exists=bkg.loads.find(l=>String(l.id)===String(sl.id)||l.container===sl.container);
+        if(!exists){
+          bkg.loads.push({
+            id:sl.id,
+            container:sl.container||'',
+            seal:sl.seal||'',
+            date:sl.date||'',
+            packdate:sl.packdate||'',
+            transporter:sl.transporter||'',
+            temp:sl.temp||'',
+            tare:sl.tare||'',
+            net:sl.net||'',
+            gross:sl.gross||'',
+            products:(sl.products||[]).map(p=>({code:p.code,desc:p.desc,kgPerBag:p.kgPerBag,bags:p.bags,net:p.net})),
+            loadedAt:sl.loadedAt||''
+          });
+        }
+      });
+      save();
+    }
+    showToast('Data synced from Sheet!');
+  }
+  catch(e){setStatus('Working offline — data saved locally','error');}
+}
+init();
+</script>
+<script>
+// ── PWA SETUP ───────────────────────────────────────────
+(function(){
+  // Generate icon using Canvas
+  function makeIcon(size){
+    const c=document.createElement('canvas');
+    c.width=c.height=size;
+    const ctx=c.getContext('2d');
+    // Background
+    ctx.fillStyle='#1a1a1a';
+    ctx.beginPath();
+    ctx.roundRect(0,0,size,size,size*0.18);
+    ctx.fill();
+    // White text
+    ctx.fillStyle='#ffffff';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.font='bold '+(size*0.28)+'px system-ui,sans-serif';
+    ctx.fillText('GCN',size/2,size*0.42);
+    ctx.font=(size*0.13)+'px system-ui,sans-serif';
+    ctx.fillStyle='rgba(255,255,255,0.65)';
+    ctx.fillText('TRACKER',size/2,size*0.67);
+    return c.toDataURL('image/png');
+  }
+
+  const icon192=makeIcon(192);
+  const icon512=makeIcon(512);
+
+  // Apple touch icon
+  document.getElementById('pwa-icon').href=icon192;
+
+  // Manifest
+  const manifest={
+    name:'Container Tracker — GCN',
+    short_name:'GCN',
+    description:'Green Charcoal Namibia Container Tracking',
+    start_url:'/',
+    display:'standalone',
+    background_color:'#f5f5f3',
+    theme_color:'#1a1a1a',
+    icons:[
+      {src:icon192,sizes:'192x192',type:'image/png',purpose:'any maskable'},
+      {src:icon512,sizes:'512x512',type:'image/png'}
+    ]
+  };
+  const blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
+  document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
+
+  // Service Worker
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  }
+})();
+// ────────────────────────────────────────────────────────
+</script>
+</body>
+</html>
